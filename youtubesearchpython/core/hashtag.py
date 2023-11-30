@@ -15,7 +15,7 @@ class HashtagCore(ComponentHandler):
     resultComponents = []
 
     def __init__(self, hashtag: str, limit: int, language: str, region: str, timeout: int, proxy: dict,
-                 user_agent: str):
+                 user_agent: str = userAgent):
         self.hashtag = hashtag
         self.limit = limit
         self.language = language

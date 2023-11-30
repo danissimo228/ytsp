@@ -1786,14 +1786,14 @@ class Hashtag(HashtagCore):
     '''
 
     def __init__(self, hashtag: str, limit: int = 60, language: str = 'en', region: str = 'US', timeout: int = None, proxy: dict = None,
-                 user_agent: str = None):
+                 user_agent: str = userAgent):
         super().__init__(hashtag, limit, language, region, timeout, proxy, user_agent)
         self.sync_create()
 
 
 class Suggestions(SuggestionsCore):
     def __init__(self, language: str = "en", region: str = "US", timeout: int = None, proxy: dict = None,
-                 user_agent: str = None):
+                 user_agent: str = userAgent):
         super().__init__(language, region, timeout, proxy, user_agent)
 
     def get(self, query: str, mode: int = ResultMode.dict):

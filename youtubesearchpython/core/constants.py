@@ -74,3 +74,47 @@ class VideoSortOrder:
 class ChannelRequestType:
     info = "EgVhYm91dA%3D%3D"
     playlists = "EglwbGF5bGlzdHMYAyABcAA%3D"
+
+
+CLIENTS = {
+    "MWEB": {
+        'context': {
+            'client': {
+                'clientName': 'MWEB',
+                'clientVersion': '2.20211109.01.00'
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    },
+    "ANDROID": {
+        'context': {
+            'client': {
+                'clientName': 'ANDROID',
+                'clientVersion': '16.20'
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    },
+    "ANDROID_EMBED": {
+        'context': {
+            'client': {
+                'clientName': 'ANDROID',
+                'clientVersion': '16.20',
+                'clientScreen': 'EMBED'
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    },
+    "TV_EMBED": {
+        "context": {
+            "client": {
+                "clientName": "TVHTML5_SIMPLY_EMBEDDED_PLAYER",
+                "clientVersion": "2.0"
+            },
+            "thirdParty": {
+                "embedUrl": "https://www.youtube.com/",
+            }
+        },
+        'api_key': 'AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8'
+    }
+}

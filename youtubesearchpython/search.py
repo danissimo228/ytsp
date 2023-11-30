@@ -70,7 +70,7 @@ class Search(SearchCore):
     '''
 
     def __init__(self, query: str, limit: int = 20, language: str = 'en', region: str = 'US', timeout: int = None,
-                 proxy: dict = None, user_agent: str = None):
+                 proxy: dict = None, user_agent: str = userAgent):
         self.searchMode = (True, True, True)
         super().__init__(query, limit, language, region, None, timeout, proxy, user_agent)
         self.sync_create()
@@ -147,7 +147,7 @@ class VideosSearch(SearchCore):
     '''
 
     def __init__(self, query: str, limit: int = 20, language: str = 'en', region: str = 'US', timeout: int = None,
-                 proxy: dict = None, user_agent: str = None):
+                 proxy: dict = None, user_agent: str = userAgent):
         self.searchMode = (True, False, False)
         super().__init__(query, limit, language, region, SearchMode.videos, timeout, proxy, user_agent)
         self.sync_create()
@@ -199,7 +199,7 @@ class ChannelsSearch(SearchCore):
     '''
 
     def __init__(self, query: str, limit: int = 20, language: str = 'en', region: str = 'US', timeout: int = None,
-                 proxy: dict = None, user_agent: str = None):
+                 proxy: dict = None, user_agent: str = userAgent):
         self.searchMode = (False, True, False)
         super().__init__(query, limit, language, region, SearchMode.channels, timeout, proxy, user_agent)
         self.sync_create()
@@ -264,7 +264,7 @@ class PlaylistsSearch(SearchCore):
     '''
 
     def __init__(self, query: str, limit: int = 20, language: str = 'en', region: str = 'US', timeout: int = None,
-                 proxy: dict = None, user_agent: str = None):
+                 proxy: dict = None, user_agent: str = userAgent):
         self.searchMode = (False, False, True)
         super().__init__(query, limit, language, region, SearchMode.playlists, timeout, proxy, user_agent)
         self.sync_create()
@@ -348,7 +348,7 @@ class ChannelSearch(ChannelSearchCore):
 
     def __init__(self, query: str, browseId: str, language: str = 'en', region: str = 'US',
                  searchPreferences: str = "EgZzZWFyY2g%3D", timeout: int = None, proxy: dict = None,
-                 user_agent: str = None):
+                 user_agent: str = userAgent):
         super().__init__(query, language, region, searchPreferences, browseId, timeout, proxy, user_agent)
         self.sync_create()
 
@@ -431,7 +431,7 @@ class CustomSearch(SearchCore):
     '''
 
     def __init__(self, query: str, searchPreferences: str, limit: int = 20, language: str = 'en', region: str = 'US',
-                 timeout: int = None, proxy: dict = None, user_agent: str = None):
+                 timeout: int = None, proxy: dict = None, user_agent: str = userAgent):
         self.searchMode = (True, True, True)
         super().__init__(query, limit, language, region, searchPreferences, timeout, proxy, user_agent)
         self.sync_create()
