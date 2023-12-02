@@ -43,6 +43,12 @@ class ChannelCore(RequestCore):
         thumbnails = []
         try:
             thumbnails.extend(getValue(response, ["header", "c4TabbedHeaderRenderer", "avatar", "thumbnails"]))
+            self.continuation = getValue(response,
+                                       ["header", "c4TabbedHeaderRenderer", "tagline", "channelTaglineRenderer",
+                                        "moreEndpoint", "showEngagementPanelEndpoint", "engagementPanel",
+                                        "engagementPanelSectionListRenderer", "content", "sectionListRenderer",
+                                        "contents", 0, "itemSectionRenderer", "contents", 0, "continuationItemRenderer",
+                                        "continuationEndpoint", "continuationCommand", "token"])
         except:
             pass
         try:
