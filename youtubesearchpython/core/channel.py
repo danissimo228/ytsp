@@ -54,7 +54,6 @@ class ChannelCore(RequestCore):
         except:
             pass
 
-        tabData: dict = {}
         playlists: list = []
 
         for tab in getValue(response, ["contents", "twoColumnBrowseResultsRenderer", "tabs"]):
@@ -73,12 +72,6 @@ class ChannelCore(RequestCore):
                             break
                         i: dict = i["gridPlaylistRenderer"]
                         playlists.append(self.playlist_parse(i))
-            elif title == "About":
-                tabData = tab["tabRenderer"]
-
-        metadata = getValue(tabData,
-                            ["content", "sectionListRenderer", "contents", 0, "itemSectionRenderer", "contents", 0,
-                             "channelAboutFullMetadataRenderer"])
 
         self.result = {
             "id": getValue(response, ["metadata", "channelMetadataRenderer", "externalId"]),
@@ -98,9 +91,6 @@ class ChannelCore(RequestCore):
             "isFamilySafe": getValue(response, ["metadata", "channelMetadataRenderer", "isFamilySafe"]),
             "keywords": getValue(response, ["metadata", "channelMetadataRenderer", "keywords"]),
             "tags": getValue(response, ["microformat", "microformatDataRenderer", "tags"]),
-            "views": getValue(metadata, ["viewCountText", "simpleText"]) if metadata else None,
-            "joinedDate": getValue(metadata, ["joinedDateText", "runs", -1, "text"]) if metadata else None,
-            "country": getValue(metadata, ["country", "simpleText"]) if metadata else None,
             "playlists": playlists,
         }
 
@@ -120,6 +110,26 @@ class ChannelCore(RequestCore):
             elif getValue(i, ['gridPlaylistRenderer']):
                 self.result["playlists"].append(self.playlist_parse(getValue(i, ['gridPlaylistRenderer'])))
             # TODO: Handle other types like gridShowRenderer
+
+    def about_data(self):
+        response = self.data.json()
+        self.result = {
+
+            "views": getValue(response,
+                              ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction", "continuationItems",
+                               0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "viewCountText"]),
+            "joinedDate": getValue(response,
+                                   ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction",
+                                    "continuationItems",
+                                    0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "joinedDateText",
+                                    "content"]),
+            "country": getValue(response,
+                                ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction", "continuationItems",
+                                 0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "country"]),
+            "videos": getValue(response,
+                               ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction", "continuationItems",
+                                0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "videoCountText"]),
+        }
 
     async def async_next(self):
         if not self.continuation:
@@ -147,3 +157,17 @@ class ChannelCore(RequestCore):
         self.prepare_request()
         self.data = self.syncPostRequest()
         self.parse_response()
+
+    async def async_about(self):
+        if not self.continuation:
+            return
+        self.prepare_request()
+        self.data = await self.asyncPostRequest()
+        self.about_data()
+
+    def sync_about(self):
+        if not self.continuation:
+            return
+        self.prepare_request()
+        self.data = self.syncPostRequest()
+        self.about_data()
