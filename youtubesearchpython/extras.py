@@ -1785,7 +1785,8 @@ class Hashtag(HashtagCore):
         }
     '''
 
-    def __init__(self, hashtag: str, limit: int = 60, language: str = 'en', region: str = 'US', timeout: int = None, proxy: dict = None,
+    def __init__(self, hashtag: str, limit: int = 60, language: str = 'en', region: str = 'US', timeout: int = None,
+                 proxy: dict = None,
                  user_agent: str = userAgent):
         super().__init__(hashtag, limit, language, region, timeout, proxy, user_agent)
         self.sync_create()
@@ -1838,6 +1839,9 @@ class Channel(ChannelCore):
 
     def next(self):
         self.sync_next()
+
+    def about(self):
+        self.sync_about()
 
     @staticmethod
     def get(channel_id: str, request_type: str = ChannelRequestType.info):
