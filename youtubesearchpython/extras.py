@@ -1818,6 +1818,12 @@ class Comments:
         self.hasMoreComments = self.__comments.continuationKey is not None
 
     @staticmethod
+    def count(playlistLink: str) -> Union[dict, str, None]:
+        pc = CommentsCore(playlistLink)
+        pc.sync_count()
+        return pc.commentsComponent
+
+    @staticmethod
     def get(playlistLink: str) -> Union[dict, str, None]:
         pc = CommentsCore(playlistLink)
         pc.sync_create()

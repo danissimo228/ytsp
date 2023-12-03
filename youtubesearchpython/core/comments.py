@@ -24,6 +24,7 @@ class CommentsCore(RequestCore):
         super().__init__()
         self.commentsComponent = {"result": []}
         self.responseSource = None
+        self.count = None
         self.videoLink = videoLink
 
     def prepare_continuation_request(self):
@@ -46,6 +47,16 @@ class CommentsCore(RequestCore):
             "appendContinuationItemsAction" if self.isNextRequest else "reloadContinuationItemsCommand",
             "continuationItems",
         ])
+        self.count = getValue(self.response.json(), [
+            "onResponseReceivedEndpoints", 0, "reloadContinuationItemsCommand", "continuationItems", 0, "commentsHeaderRenderer", "countText", "runs", 0, "text"
+        ])
+
+    def parse_count_source(self):
+        self.commentsComponent = None
+        self.count = getValue(self.response.json(), [
+            "onResponseReceivedEndpoints", 0, "reloadContinuationItemsCommand", "continuationItems", 0, "commentsHeaderRenderer", "countText", "runs", 0, "text"
+        ])
+        self.commentsComponent = self.count
 
     def parse_continuation_source(self):
         self.continuationKey = getValue(
@@ -104,6 +115,20 @@ class CommentsCore(RequestCore):
         self.sync_make_comment_request()
         self.__getComponents()
 
+    def sync_count(self):
+        self.sync_make_continuation_request()
+        self.prepare_comments_request()
+        self.response = self.syncPostRequest()
+        if self.response.status_code == 200:
+            self.parse_count_source()
+
+    async def async_count(self):
+        await self.async_make_continuation_request()
+        self.prepare_comments_request()
+        self.response = await self.asyncPostRequest()
+        if self.response.status_code == 200:
+            self.parse_count_source()
+
     def sync_create_next(self):
         self.isNextRequest = True
         self.sync_make_comment_request()
@@ -120,7 +145,7 @@ class CommentsCore(RequestCore):
         self.__getComponents()
 
     def __getComponents(self) -> None:
-        comments = []
+        comments = [{"count": self.count, "comments": []}]
         for comment in self.responseSource:
             comment = getValue(comment, ["commentThreadRenderer", "comment", "commentRenderer"])
             # print(json.dumps(comment, indent=4))
@@ -143,7 +168,7 @@ class CommentsCore(RequestCore):
                     },
                     "replyCount": self.__getValue(comment, ["replyCount"]),
                 }
-                comments.append(j)
+                comments[0]["comments"].append(j)
             except:
                 pass
 
