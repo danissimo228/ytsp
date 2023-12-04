@@ -2,7 +2,7 @@ import copy
 import json
 from typing import Union, List
 from urllib.parse import urlencode
-
+from time import strptime
 from youtubesearchpython.core.constants import *
 from youtubesearchpython.core.requests import RequestCore
 from youtubesearchpython.core.componenthandler import getValue, getVideoId
@@ -85,12 +85,8 @@ class ChannelCore(RequestCore):
             "description": getValue(response, ["metadata", "channelMetadataRenderer", "description"]),
             "title": getValue(response, ["metadata", "channelMetadataRenderer", "title"]),
             "banners": getValue(response, ["header", "c4TabbedHeaderRenderer", "banner", "thumbnails"]),
-            "subscribers": {
-                "simpleText": getValue(response,
-                                       ["header", "c4TabbedHeaderRenderer", "subscriberCountText", "simpleText"]),
-                "label": getValue(response, ["header", "c4TabbedHeaderRenderer", "subscriberCountText", "accessibility",
-                                             "accessibilityData", "label"])
-            },
+            "subscribers": getValue(response,
+                                       ["header", "c4TabbedHeaderRenderer", "subscriberCountText", "simpleText"]).split(" sub")[0],
             "thumbnails": thumbnails,
             "availableCountryCodes": getValue(response,
                                               ["metadata", "channelMetadataRenderer", "availableCountryCodes"]),
@@ -119,22 +115,30 @@ class ChannelCore(RequestCore):
 
     def about_data(self):
         response = self.data.json()
+
+        joined_date = getValue(response,
+                               ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction",
+                                "continuationItems",
+                                0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "joinedDateText",
+                                "content"]).split("Joined ")[1].replace(",", "").split(" ")
+
+        jd_month = strptime(joined_date[0], '%b').tm_mon
+        jd_day = joined_date[1]
+        jd_year = joined_date[2]
+        joined_date = f"{jd_day}.{jd_month}.{jd_year}"
+
         self.result = {
 
             "views": getValue(response,
                               ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction", "continuationItems",
-                               0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "viewCountText"]),
-            "joinedDate": getValue(response,
-                                   ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction",
-                                    "continuationItems",
-                                    0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "joinedDateText",
-                                    "content"]),
+                               0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "viewCountText"]).split(" view")[0].replace(",", ""),
+            "joinedDate": joined_date,
             "country": getValue(response,
                                 ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction", "continuationItems",
                                  0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "country"]),
             "videos": getValue(response,
                                ["onResponseReceivedEndpoints", 0, "appendContinuationItemsAction", "continuationItems",
-                                0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "videoCountText"]),
+                                0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "videoCountText"]).split(" video")[0].replace(",", ""),
         }
 
     async def async_next(self):

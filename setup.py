@@ -18,6 +18,8 @@ setuptools.setup(
     zip_safe=False,
     install_requires=[
         'httpx>=0.14.2'
+        'requests==2.31.0'
+        'beautifulsoup4==4.12.2'
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

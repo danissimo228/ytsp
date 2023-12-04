@@ -1854,3 +1854,25 @@ class Channel(ChannelCore):
         channel_core = ChannelCore(channel_id, request_type)
         channel_core.sync_create()
         return channel_core.result
+
+    @staticmethod
+    def data(channel_id: str, request_type: str = ChannelRequestType.info):
+        channel_core = ChannelCore(channel_id, request_type)
+        channel_core.sync_create()
+        channel_data = channel_core.result
+        channel_core.sync_about()
+        channel_about = channel_core.result
+
+        data = {
+            "id": channel_data["id"],
+            "title": channel_data["title"],
+            "description": channel_data["description"],
+            "url": channel_data["url"],
+            "subscribers": channel_data["subscribers"],
+            "view": channel_about["views"],
+            "country": channel_about["country"],
+            "videos": channel_about["videos"],
+            "created": channel_about["joinedDate"],
+        }
+
+        return data

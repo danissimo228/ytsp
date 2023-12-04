@@ -1,3 +1,4 @@
+import datetime
 import copy
 import json
 from typing import Union, List
@@ -99,12 +100,8 @@ class VideoCore(RequestCore):
             component = {
                 'id': getValue(responseSource, ['videoDetails', 'videoId']),
                 'title': getValue(responseSource, ['videoDetails', 'title']),
-                'duration': {
-                    'secondsText': getValue(responseSource, ['videoDetails', 'lengthSeconds']),
-                },
-                'viewCount': {
-                    'text': getValue(responseSource, ['videoDetails', 'viewCount'])
-                },
+                'duration': str(datetime.timedelta(seconds=int(getValue(responseSource, ['videoDetails', 'lengthSeconds'])))),
+                'viewCount': getValue(responseSource, ['videoDetails', 'viewCount']),
                 'thumbnails': getValue(responseSource, ['videoDetails', 'thumbnail', 'thumbnails']),
                 'description': getValue(responseSource, ['videoDetails', 'shortDescription']),
                 'channel': {
@@ -115,8 +112,8 @@ class VideoCore(RequestCore):
                 'averageRating': getValue(responseSource, ['videoDetails', 'averageRating']),
                 'keywords': getValue(responseSource, ['videoDetails', 'keywords']),
                 'isLiveContent': getValue(responseSource, ['videoDetails', 'isLiveContent']),
-                'publishDate': getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'publishDate']),
-                'uploadDate': getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'uploadDate']),
+                'publishDate': datetime.datetime.fromisoformat(getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'publishDate'])).strftime('%d.%m.%Y %H:%M'),
+                'uploadDate': datetime.datetime.fromisoformat(getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'uploadDate'])).strftime('%d.%m.%Y %H:%M'),
                 'isFamilySafe': getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'isFamilySafe']),
                 'category': getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'category']),
             }

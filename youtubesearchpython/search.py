@@ -1,6 +1,11 @@
+import re
+import json
+import requests
+from bs4 import BeautifulSoup as bs
 from youtubesearchpython.core.constants import *
 from youtubesearchpython.core.search import SearchCore
 from youtubesearchpython.core.channelsearch import ChannelSearchCore
+from youtubesearchpython.extras import Video, Comments
 
 
 class Search(SearchCore):
@@ -155,6 +160,70 @@ class VideosSearch(SearchCore):
 
     def next(self) -> bool:
         return self._next()
+
+    @staticmethod
+    def position(video_id: str = None, query: str = None, limit: int = 100, language: str = 'en', region: str = 'US',
+                 timeout: int = None,
+                 proxy: dict = None, user_agent: str = userAgent):
+        search = VideosSearch(query=query, language=language, region=region, timeout=timeout, proxy=proxy,
+                              user_agent=user_agent)
+
+        limit = limit % 20
+
+        videos = search.result()['result']
+        for i in range(limit):
+            search.next()
+            videos = videos + search.result()['result']
+
+        position = 0
+        for video in videos:
+            position += 1
+            if video_id == video["id"]:
+                break
+            else:
+                continue
+
+        return position
+
+    @staticmethod
+    def data(video_id: str = None):
+        data = {}
+        video = Video.get(video_id, get_upload_date=True)
+
+        if video:
+            data = {
+                "id": video["id"],
+                "title": video["title"],
+                "description": video["description"],
+                "url": video["link"],
+                "publish_date": video["publishDate"],
+                "upload_date": video["uploadDate"],
+                "view": video["viewCount"],
+                "comment": None,
+                "like": None,
+                "dislike": None,
+                "keywords": video["keywords"],
+                "duration": video["duration"],
+                "category": video["category"],
+                "channel_id": video["channel"]["id"]
+            }
+
+            comments_count = Comments.count(video_id)
+            if comments_count:
+                data["comment"] = comments_count
+
+            response = requests.get(video["link"])
+            soup = bs(response.text, "html.parser")
+            data = re.search(r"var ytInitialData = ({.*?});", soup.prettify()).group(1)
+            data_json = json.loads(data)
+            like = data_json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0][
+                'videoPrimaryInfoRenderer']['videoActions']['menuRenderer']['topLevelButtons'][0][
+                'segmentedLikeDislikeButtonRenderer']['likeCount']
+
+            if like:
+                data["like"] = like
+
+        return data
 
 
 class ChannelsSearch(SearchCore):
