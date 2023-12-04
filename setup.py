@@ -17,8 +17,8 @@ setuptools.setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'httpx>=0.14.2'
-        'requests==2.31.0'
+        'httpx>=0.14.2',
+        'requests==2.31.0',
         'beautifulsoup4==4.12.2'
     ],
     classifiers=[
