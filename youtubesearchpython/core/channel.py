@@ -2,7 +2,9 @@ import copy
 import json
 from typing import Union, List
 from urllib.parse import urlencode
-from time import strptime
+import time
+import datetime
+import pytz
 from youtubesearchpython.core.constants import *
 from youtubesearchpython.core.requests import RequestCore
 from youtubesearchpython.core.componenthandler import getValue, getVideoId
@@ -79,14 +81,19 @@ class ChannelCore(RequestCore):
                         i: dict = i["gridPlaylistRenderer"]
                         playlists.append(self.playlist_parse(i))
 
+        subscribe = getValue(response,["header", "c4TabbedHeaderRenderer", "subscriberCountText", "simpleText"]).split(" sub")[0]
+        if "K" in subscribe:
+            subscribe = subscribe.split("K")[0].replace(",", "").replace(".", "") + "000"
+        if "M" in subscribe:
+            subscribe = subscribe.split("M")[0].replace(",", "").replace(".", "") + "0000"
+
         self.result = {
             "id": getValue(response, ["metadata", "channelMetadataRenderer", "externalId"]),
             "url": getValue(response, ["metadata", "channelMetadataRenderer", "channelUrl"]),
             "description": getValue(response, ["metadata", "channelMetadataRenderer", "description"]),
             "title": getValue(response, ["metadata", "channelMetadataRenderer", "title"]),
             "banners": getValue(response, ["header", "c4TabbedHeaderRenderer", "banner", "thumbnails"]),
-            "subscribers": getValue(response,
-                                       ["header", "c4TabbedHeaderRenderer", "subscriberCountText", "simpleText"]).split(" sub")[0],
+            "subscribers": subscribe,
             "thumbnails": thumbnails,
             "availableCountryCodes": getValue(response,
                                               ["metadata", "channelMetadataRenderer", "availableCountryCodes"]),
@@ -122,11 +129,10 @@ class ChannelCore(RequestCore):
                                 0, "aboutChannelRenderer", "metadata", "aboutChannelViewModel", "joinedDateText",
                                 "content"]).split("Joined ")[1].replace(",", "").split(" ")
 
-        jd_month = strptime(joined_date[0], '%b').tm_mon
+        jd_month = time.strptime(joined_date[0], '%b').tm_mon
         jd_day = joined_date[1]
         jd_year = joined_date[2]
-        joined_date = f"{jd_day}.{jd_month}.{jd_year}"
-
+        joined_date = datetime.datetime.strptime(f'{jd_day}-{jd_month}-{jd_year} 00:00:00', '%d-%m-%Y %H:%M:%S')
         self.result = {
 
             "views": getValue(response,

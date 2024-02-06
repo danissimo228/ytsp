@@ -205,20 +205,30 @@ class VideosSearch(SearchCore):
                 "keywords": video["keywords"],
                 "duration": video["duration"],
                 "category": video["category"],
-                "channel_id": video["channel"]["id"]
+                "average_rating": video["averageRating"],
+                "thumbnails": video["thumbnails"],
+                "channel": {
+                    "id": video["channel"]["id"],
+                    "name": video["channel"]["name"],
+                    "url": video["channel"]["link"]
+                }
             }
 
             comments_count = Comments.count(video_id)
             if comments_count:
                 data["comment"] = comments_count
 
-            response = requests.get(video["link"])
-            soup = bs(response.text, "html.parser")
-            data = re.search(r"var ytInitialData = ({.*?});", soup.prettify()).group(1)
-            data_json = json.loads(data)
-            like = data_json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0][
-                'videoPrimaryInfoRenderer']['videoActions']['menuRenderer']['topLevelButtons'][0][
-                'segmentedLikeDislikeButtonRenderer']['likeCount']
+            try:
+                response = requests.get(video["link"])
+                soup = bs(response.text, "html.parser")
+                soup_data = re.search(r"var ytInitialData = ({.*?});", soup.prettify()).group(1)
+                data_json = json.loads(soup_data)
+                like = data_json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0][
+                    'videoPrimaryInfoRenderer']['videoActions']['menuRenderer']['topLevelButtons'][0][
+                    'segmentedLikeDislikeButtonRenderer']['likeCount']
+            except:
+                like = 0
+                
 
             if like:
                 data["like"] = like

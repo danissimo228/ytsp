@@ -1868,11 +1868,13 @@ class Channel(ChannelCore):
             "title": channel_data["title"],
             "description": channel_data["description"],
             "url": channel_data["url"],
-            "subscribers": channel_data["subscribers"],
+            "subscriber": channel_data["subscribers"],
             "view": channel_about["views"],
             "country": channel_about["country"],
-            "videos": channel_about["videos"],
+            "video": channel_about["videos"],
             "created": channel_about["joinedDate"],
+            "keywords": channel_data["tags"],
+            "thumbnails": channel_data["thumbnails"],
         }
 
         return data
