@@ -225,10 +225,12 @@ class VideosSearch(SearchCore):
                 data_json = json.loads(soup_data)
                 like = data_json['contents']['twoColumnWatchNextResults']['results']['results']['contents'][0][
                     'videoPrimaryInfoRenderer']['videoActions']['menuRenderer']['topLevelButtons'][0][
-                    'segmentedLikeDislikeButtonRenderer']['likeCount']
+                    'segmentedLikeDislikeButtonViewModel']['likeButtonViewModel'][
+                    'likeButtonViewModel']['toggleButtonViewModel']['toggleButtonViewModel'][
+                    'defaultButtonViewModel']['buttonViewModel']['title']
             except:
                 like = 0
-                
+
 
             if like:
                 data["like"] = like
