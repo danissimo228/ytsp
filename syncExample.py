@@ -118,8 +118,10 @@ YouTube doesn't provide uploadDate and publishDate in its InnerTube API, thus we
 This is disabled by default as it is very inefficient, but if you really need it, you can explicitly set parameter to Video class: enableHTML=True
 '''
 print("########################################### VIDEO GET ##################################################")
-video = Video.get('https://www.youtube.com/watch?v=z0GKGpObgPY', mode=ResultMode.json, get_upload_date=True)
+# video = Video.get('https://www.youtube.com/watch?v=z0GKGpObgPY', mode=ResultMode.json, get_upload_date=True)
+video = Video.get_video('https://www.youtube.com/watch?v=WY1kRP92r3E', mode=ResultMode.json, get_upload_date=True)
 print(video)
+print("______________________________________________________VIDEO GET ##################################################")
 videoInfo = Video.getInfo('https://youtu.be/z0GKGpObgPY', mode=ResultMode.json)
 print(videoInfo)
 videoFormats = Video.getFormats('z0GKGpObgPY')

@@ -57,6 +57,15 @@ class VideoCore(RequestCore):
         else:
             raise Exception('ERROR: Invalid status code.')
 
+    def video_get_sync_create(self, video_id: str = None):
+        self.prepare_innertube_request()
+        response = self.video_get_syncPostRequest(video_id=video_id)
+        self.response = response.text
+        if response.status_code == 200:
+            self.post_request_processing()
+        else:
+            raise Exception('ERROR: Invalid status code.')
+
     def prepare_html_request(self):
         self.url = 'https://www.youtube.com/youtubei/v1/player' + "?" + urlencode({
             'key': searchKey,
@@ -69,6 +78,11 @@ class VideoCore(RequestCore):
     def sync_html_create(self):
         self.prepare_html_request()
         response = self.syncPostRequest()
+        self.HTMLresponseSource = response.json()
+
+    def video_get_sync_html_create(self):  # new
+        self.prepare_html_request()
+        response = self.video_get_syncPostRequest()
         self.HTMLresponseSource = response.json()
 
     async def async_html_create(self):
@@ -97,10 +111,14 @@ class VideoCore(RequestCore):
                 responseSource = None
             if self.enableHTML:
                 responseSource = self.HTMLresponseSource
+
+
+            v = responseSource.get('streamingData', {}).get('formats', [])
+            print([i['approxDurationMs'] for i in v if i.get('approxDurationMs', None)])
             component = {
                 'id': getValue(responseSource, ['videoDetails', 'videoId']),
                 'title': getValue(responseSource, ['videoDetails', 'title']),
-                'duration': str(datetime.timedelta(seconds=int(getValue(responseSource, ['videoDetails', 'lengthSeconds'])))),
+                # 'duration': str(datetime.timedelta(seconds=int(getValue(responseSource, ['videoDetails', 'lengthSeconds'])))),
                 'viewCount': getValue(responseSource, ['videoDetails', 'viewCount']),
                 'thumbnails': getValue(responseSource, ['videoDetails', 'thumbnail', 'thumbnails']),
                 'description': getValue(responseSource, ['videoDetails', 'shortDescription']),
@@ -112,14 +130,15 @@ class VideoCore(RequestCore):
                 'averageRating': getValue(responseSource, ['videoDetails', 'averageRating']),
                 'keywords': getValue(responseSource, ['videoDetails', 'keywords']),
                 'isLiveContent': getValue(responseSource, ['videoDetails', 'isLiveContent']),
-                'publishDate': datetime.datetime.fromisoformat(getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'publishDate'])).strftime('%d.%m.%Y %H:%M'),
-                'uploadDate': datetime.datetime.fromisoformat(getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'uploadDate'])).strftime('%d.%m.%Y %H:%M'),
+                # 'publishDate': datetime.datetime.fromisoformat(getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'publishDate'])).strftime('%d.%m.%Y %H:%M'),
+                # 'uploadDate': datetime.datetime.fromisoformat(getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'uploadDate'])).strftime('%d.%m.%Y %H:%M'),
                 'isFamilySafe': getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'isFamilySafe']),
                 'category': getValue(responseSource, ['microformat', 'playerMicroformatRenderer', 'category']),
             }
             component['isLiveNow'] = component['isLiveContent'] and component['duration']['secondsText'] == "0"
-            component['link'] = 'https://www.youtube.com/watch?v=' + component['id']
-            component['channel']['link'] = 'https://www.youtube.com/channel/' + component['channel']['id']
+
+            component['link'] = 'https://www.youtube.com/watch?v=' + str(component['id'])
+            component['channel']['link'] = 'https://www.youtube.com/channel/' + str(component['channel']['id'])
             videoComponent.update(component)
         if mode in ['getFormats', None]:
             videoComponent.update(

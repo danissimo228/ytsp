@@ -267,6 +267,23 @@ class Video:
         return vc.result
 
     @staticmethod
+    def get_video(   # new
+            videoLink: str,
+            mode: int = ResultMode.dict,
+            timeout: int = None,
+            get_upload_date: bool = False
+    ) -> Union[dict, str, None]:
+
+        vc = VideoCore(videoLink, None, mode, timeout, get_upload_date)
+        if get_upload_date:
+            vc.video_get_sync_html_create()
+        videoLink = videoLink.split("=")
+        video_id = videoLink[1] if len(videoLink) > 1 else None
+        print(video_id)
+        vc.video_get_sync_create(video_id=video_id)
+        return vc.result
+
+    @staticmethod
     def getInfo(videoLink: str, mode: int = ResultMode.dict, timeout: int = None) -> Union[dict, str, None]:
         '''Fetches only information for the given video link or ID.
         Returns None if video is unavailable.
@@ -536,7 +553,8 @@ class Video:
             }
         '''
         vc = VideoCore(videoLink, "getFormats", mode, timeout, False)
-        vc.sync_create()
+        # vc.sync_create()   # new
+        vc.video_get_sync_create()
         return vc.result
 
 
