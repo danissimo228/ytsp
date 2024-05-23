@@ -19,6 +19,25 @@ class RequestCore:
             self.proxy["https://"] = https_proxy
 
     def syncPostRequest(self) -> httpx.Response:
+        if self.url == 'https://www.youtube.com/youtubei/v1/player?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8&contentCheckOk=True&racyCheckOk=True&videoId=z0GKGpObgPY':
+            print("============================================================================")
+            print(self.url)
+            print({"User-Agent": self.user_agent},"asdasd")
+            print(self.data,"asdasd")
+            print(self.timeout, "asdasd")
+            print(self.proxy,"asdasd")
+            from tete import a
+            self.data = a
+            self.url = 'https://www.youtube.com/youtubei/v1/player?prettyPrint=false'
+            print(httpx.post(
+                self.url,
+                headers={"User-Agent": self.user_agent},
+                json=self.data,
+                timeout=self.timeout,
+                proxies=self.proxy
+            ).text)
+            print("============================================================================")
+
         return httpx.post(
             self.url,
             headers={"User-Agent": self.user_agent},
